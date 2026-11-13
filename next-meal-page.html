@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Next Meal - Meal Max</title>
+  <link rel="stylesheet" href="next-meal.css" />
+  <script src="next-meal-data.js" defer></script>
+  <script src="next-meal.js" defer></script>
+</head>
+<body>
+  <div class="brand-header">
+    <div class="logo-box" aria-hidden="true"></div>
+    <h1>Meal Max</h1>
+  </div>
+
+  <nav class="user-nav" aria-label="Main navigation">
+    <a href="home-page.html">Home</a>
+    <a href="next-meal-page.html" aria-current="page">Next Meal</a>
+    <a href="saved-recipes-page.html">Saved Recipes</a>
+    <a href="grocery-lists-page.html">Grocery Lists</a>
+  </nav>
+
+  <main class="page-container">
+    <div class="section-header">
+      <a href="home-page.html" class="back-btn" aria-label="Back to home">&lt;</a>
+      <h2>Find Your Next Meal</h2>
+    </div>
+    <p class="intro">Explore your results. Open a recipe for the details and save your favorites.</p>
+
+    <form id="search-form" class="search-panel" role="search" aria-label="Search recipes">
+      <label for="query">Search recipes</label>
+      <div class="search-row">
+        <input id="query" name="q" type="search" placeholder="Recipe or ingredient" />
+        <button class="primary-btn" type="submit">Search</button>
+      </div>
+      <button type="button" id="clear-search" class="text-btn" hidden>Clear search</button>
+    </form>
+
+    <div class="results-header">
+      <h3 id="results-heading">Search results</h3>
+      <p id="result-count" class="result-count" role="status" aria-live="polite"></p>
+    </div>
+    <ul id="recipe-list" class="recipe-list" aria-labelledby="results-heading" tabindex="0"></ul>
+    <div id="empty-state" class="empty-state" hidden>
+      <h3>No recipes found</h3>
+      <p>Try another recipe name or ingredient.</p>
+      <button type="button" id="show-all" class="primary-btn">Show all recipes</button>
+    </div>
+    <noscript><p>Enable JavaScript to search and save recipes.</p></noscript>
+  </main>
+
+  <dialog id="recipe-popup" class="recipe-popup" aria-labelledby="popup-title">
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2 id="popup-title"></h2>
+        <button type="button" class="close-popup" aria-label="Close recipe" autofocus>×</button>
+      </div>
+      <img id="popup-photo" class="popup-photo" alt="" />
+      <p id="popup-meta" class="popup-meta"></p>
+      <p id="popup-description" class="popup-description"></p>
+      <h3>Ingredients</h3>
+      <ul id="popup-ingredients" class="popup-list"></ul>
+      <h3>Directions</h3>
+      <ol id="popup-directions" class="popup-list"></ol>
+    </div>
+    <div class="popup-actions">
+      <button type="button" id="save-recipe" class="primary-btn">Add to My Saved Recipes +</button>
+      <p id="popup-status" class="popup-status" role="status" aria-live="polite"></p>
+      <a class="saved-link" href="saved-recipes-page.html">View My Saved Recipes &rarr;</a>
+    </div>
+  </dialog>
+
+  <template id="recipe-card-template">
+    <li>
+      <button type="button" class="recipe-card" aria-haspopup="dialog" aria-controls="recipe-popup">
+        <img class="recipe-photo" alt="" loading="lazy" />
+        <span class="recipe-body">
+          <span class="recipe-title"></span>
+          <span class="recipe-meta"></span>
+          <span class="recipe-desc"></span>
+          <span class="recipe-tags"></span>
+        </span>
+        <span class="recipe-arrow" aria-hidden="true">&gt;</span>
+      </button>
+    </li>
+  </template>
+</body>
+</html>
