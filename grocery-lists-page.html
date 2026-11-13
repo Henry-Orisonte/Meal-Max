@@ -13,8 +13,20 @@
         background: white;
         color: #111827;
     }
+
+    /* ---------- Grocery lists ---------- */
+    .back-link {
+        display: inline-block;
+        margin: 28px 0 8px;
+        color: #111111;
+        font-weight: 500;
+    }
+    .back-link:focus-visible {
+        outline: 3px solid #6b7280;
+        outline-offset: 2px;
+    }
     .subheader {
-        margin: 28px 0 16px;
+        margin: 0 0 16px;
         padding-bottom: 10px;
         border-bottom: 2px solid #111111;
         font-size: 16px;
@@ -116,6 +128,7 @@
     </header>
 
     <main>
+        <a href="home-page.html" class="back-link">‹ Back to home</a>
         <h2 class="subheader">MY GROCERY LISTS</h2>
         <ul class="grocery-scroll" id="grocery-lists"></ul>
     </main>
@@ -124,7 +137,7 @@
     <script>
     const PREVIEW_LIMIT = 5;
     const listEl = document.getElementById('grocery-lists');
-    let current = null; // item that is currently expanded
+    let current = null; // the item that is currently expanded
 
     function el(tag, className, text) {
         const node = document.createElement(tag);
