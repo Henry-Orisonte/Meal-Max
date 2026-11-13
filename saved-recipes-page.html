@@ -204,6 +204,33 @@
       padding: 40px 0;
       font-size: 16px;
     }
+    .recipe-popup { box-sizing: border-box; width: min(560px, calc(100% - 32px)); max-height: 90vh; padding: 0; border: 1px solid #d1d5db; border-radius: 12px; color: #111827; }
+    .recipe-popup::backdrop { background: rgb(17 24 39 / 55%); }
+    .popup-content { padding: 24px; }
+    .popup-header { display: flex; align-items: start; gap: 16px; margin-bottom: 20px; }
+    .popup-header h2 { flex: 1; margin: 0; font-size: 24px; }
+    .close-popup { border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 24px; width: 36px; height: 36px; cursor: pointer; }
+    .popup-image-frame { aspect-ratio: 4 / 3; }
+    .popup-photo { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+    .popup-description { line-height: 1.65; margin: 20px 0 0; }
+    .popup-actions { display: flex; border-top: 1px solid #d1d5db; }
+    .popup-actions button { flex: 1; padding: 18px 12px; border: 0; background: #111827; color: white; font: inherit; cursor: pointer; }
+    .popup-actions button + button { border-left: 1px solid #6b7280; }
+    .popup-actions button:hover { background: #374151; }
+    .popup-actions button[aria-pressed="true"] { background: #4f46e5; }
+    .popup-status { padding: 0 24px; font-size: 14px; }
+    :focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
+    @media (max-width: 540px) {
+      body { margin: 20px auto; padding: 0 12px; }
+      .user-nav { gap: 12px; flex-wrap: wrap; }
+      .user-nav a { font-size: 14px; }
+      .page-container { padding: 16px; }
+      .section-header h2 { font-size: 18px; }
+      .recipe-photo { width: 100px; }
+      .recipe-body { padding: 12px; min-width: 0; }
+      .recipe-body h3 { font-size: 16px; }
+      .recipe-action { padding: 0 8px; }
+    }
   </style>
 </head>
 <body>
@@ -229,43 +256,98 @@
     <div id="recipe-list" class="recipe-list"></div>
   </main>
 
+  <dialog id="recipe-popup" class="recipe-popup" aria-labelledby="popup-title">
+    <div class="popup-content">
+      <div class="popup-header"><h2 id="popup-title"></h2><button type="button" class="close-popup" aria-label="Close recipe">×</button></div>
+      <div class="popup-image-frame"><img id="popup-photo" class="popup-photo" alt="" /></div>
+      <p id="popup-description" class="popup-description"></p>
+    </div>
+    <div id="popup-actions" class="popup-actions"></div>
+    <p id="popup-status" class="popup-status" role="status"></p>
+  </dialog>
+
   <script>
     const defaultRecipes = [
       {
         id: 1,
         title: "Garlic Butter Salmon",
         description: "Pan-seared salmon fillets finished in a rich lemon garlic herb butter sauce. Served alongside oven-roasted asparagus spears and crispy seasoned baby potatoes for a balanced weeknight dinner.",
-        photo: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=400&q=80"
+        photo: "assets/recipes/salmon.jpg"
       },
       {
         id: 2,
         title: "Classic Chicken Alfredo",
         description: "Creamy homemade parmesan alfredo sauce tossed with al dente fettuccine pasta, sliced herb-seasoned grilled chicken breast, cracked black pepper, and fresh chopped Italian parsley.",
-        photo: ""
+        photo: "assets/recipes/alfredo.jpg"
       },
       {
         id: 3,
         title: "Veggie Teriyaki Stir Fry",
         description: "Crisp broccoli florets, sweet red bell peppers, julienned carrots, and snap peas wok-tossed in a savory homemade soy-ginger garlic glaze over fluffy steamed jasmine rice.",
-        photo: ""
+        photo: "assets/recipes/stir-fry.jpg"
       },
       {
         id: 4,
         title: "Spicy Black Bean Tacos",
         description: "Warm charred corn tortillas filled with cumin-spiced black beans, smoky roasted corn salsa, sliced ripe avocado, crumbled cotija cheese, fresh cilantro, and a squeeze of lime.",
-        photo: ""
+        photo: "assets/recipes/tacos.jpg"
       },
       {
         id: 5,
         title: "Mediterranean Chickpea Bowl",
         description: "Fluffy herbed quinoa topped with crispy spiced roasted chickpeas, diced English cucumbers, sweet cherry tomatoes, kalamata olives, feta cheese, and a bright lemon tahini dressing.",
-        photo: ""
+        photo: "assets/recipes/chickpea-bowl.jpg"
       }
     ];
     // Replace defaultRecipes with [] later
     // Dummy recipes
 
-    const savedRecipes = JSON.parse(localStorage.getItem("savedRecipes")) || defaultRecipes;
+    let savedRecipes;
+    try { savedRecipes = JSON.parse(localStorage.getItem("savedRecipes")); } catch {}
+    if (!Array.isArray(savedRecipes)) savedRecipes = defaultRecipes;
+    // Fill missing images on older saved copies of the sample recipes, too.
+    savedRecipes = savedRecipes.map(recipe => ({ ...recipe, photo: recipe.photo || defaultRecipes.find(sample => sample.title === recipe.title)?.photo || "assets/recipes/chickpea-bowl.jpg" }));
+    const popup = document.getElementById("recipe-popup");
+    const actions = document.getElementById("popup-actions");
+    const status = document.getElementById("popup-status");
+
+    function openRecipe(recipe) {
+      document.getElementById("popup-title").textContent = recipe.title;
+      const image = document.getElementById("popup-photo");
+      image.src = recipe.photo;
+      image.alt = recipe.title;
+      document.getElementById("popup-description").textContent = recipe.description;
+      status.textContent = "";
+      popup.dataset.state = "recipe";
+      actions.replaceChildren();
+      const add = document.createElement("button");
+      add.type = "button";
+      add.textContent = "Add Ingredients +";
+      add.onclick = () => {
+        popup.dataset.state = "choose-list";
+        actions.replaceChildren();
+        ["Add to Existing", "Create New"].forEach((label, index) => {
+          const option = document.createElement("button");
+          option.type = "button";
+          option.textContent = label;
+          option.setAttribute("aria-pressed", "false");
+          option.onclick = () => {
+            popup.dataset.state = index === 0 ? "existing" : "new";
+            actions.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", String(button === option)));
+            status.textContent = label + " selected.";
+          };
+          actions.appendChild(option);
+        });
+        actions.querySelector("button").focus();
+      };
+      actions.appendChild(add);
+      popup.showModal();
+    }
+    popup.querySelector(".close-popup").onclick = () => popup.close();
+    popup.addEventListener("click", event => { if (event.target === popup) {
+      const bounds = popup.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) popup.close();
+    }});
     const MAX_LENGTH = 85;
 
     function renderRecipes() {
@@ -318,7 +400,7 @@
 
         card.querySelector(".open-recipe-btn").addEventListener("click", () => {
           localStorage.setItem("selectedRecipe", JSON.stringify(recipe));
-          alert(`${recipe.title}\n\n${recipe.description}`);
+          openRecipe(recipe);
         });
 
         listContainer.appendChild(card);
