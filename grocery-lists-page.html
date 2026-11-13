@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grocery Lists</title>
+    <style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+        background: white;
+        color: #111827;
+    }
+    .subheader {
+        margin: 28px 0 16px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #111111;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+    .grocery-scroll {
+        max-height: min(60vh, 480px);
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        list-style: none;
+    }
+    .grocery-item + .grocery-item {
+        border-top: 1px solid #d1d5db;
+    }
+    .grocery-item__toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 16px;
+        border: 0;
+        background: transparent;
+        color: #111827;
+        font: inherit;
+        font-size: 16px;
+        font-weight: 500;
+        text-align: left;
+        cursor: pointer;
+    }
+    .grocery-item__toggle:hover {
+        background: #f3f4f6;
+    }
+    .grocery-item__toggle:focus-visible,
+    .view-more-link:focus-visible,
+    .route-button:focus-visible {
+        outline: 3px solid #6b7280;
+        outline-offset: 2px;
+    }
+    .grocery-item__chevron {
+        transition: transform 150ms ease;
+    }
+    .grocery-item.is-open .grocery-item__chevron {
+        transform: rotate(180deg);
+    }
+    .grocery-item__panel {
+        padding-bottom: 14px;
+    }
+    .grocery-item__ingredients {
+        margin: 0;
+        padding: 0 16px 8px 36px;
+    }
+    .grocery-item__ingredients li + li {
+        margin-top: 6px;
+    }
+    .ingredient-qty {
+        color: #6b7280;
+    }
+    .view-more-link {
+        display: inline-block;
+        margin: 0 16px 4px 36px;
+        color: #111111;
+        font-weight: 500;
+        text-decoration: underline;
+    }
+    .grocery-item__actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 8px 16px 0;
+    }
+    .route-button {
+        padding: 10px 18px;
+        background: #111111;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .grocery-item__chevron { transition: none; }
+    }
+    </style>
+</head>
+<body>
+    <h1>Meal Max </h1>
+    <header>
+        <nav>
+            <a href="home-page.html" >Home</a>
+            <a href="next-meal-page.html" >Next Meal</a>
+            <a href="saved-recipes-page.html" >Saved Recipes</a>
+            <a href="grocery-lists-page.html" >Grocery Lists</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="subheader">MY GROCERY LISTS</h2>
+        <ul class="grocery-scroll" id="grocery-lists"></ul>
+    </main>
+
+    <script src="grocery-data.js"></script>
+    <script>
+    const PREVIEW_LIMIT = 5;
+    const listEl = document.getElementById('grocery-lists');
+    let current = null; // item that is currently expanded
+
+    function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text) node.textContent = text;
+        return node;
+    }
+
+    function setExpanded(item, expanded) {
+        item.li.classList.toggle('is-open', expanded);
+        item.button.setAttribute('aria-expanded', String(expanded));
+        item.panel.hidden = !expanded;
+    }
+
+    function handleToggle(item) {
+        if (current && current !== item) setExpanded(current, false);
+        const willOpen = current !== item;
+        setExpanded(item, willOpen);
+        current = willOpen ? item : null;
+    }
+
+    function buildItem(list) {
+        const panelId = 'ingredients-' + list.id;
+        const li = el('li', 'grocery-item');
+
+        const button = el('button', 'grocery-item__toggle');
+        button.type = 'button';
+        button.setAttribute('aria-controls', panelId);
+        const chevron = el('span', 'grocery-item__chevron', '▾');
+        chevron.setAttribute('aria-hidden', 'true');
+        button.append(el('span', '', list.name), chevron);
+
+        const panel = el('div', 'grocery-item__panel');
+        panel.id = panelId;
+
+        const hasMore = list.ingredients.length > PREVIEW_LIMIT;
+        const visible = hasMore ? list.ingredients.slice(0, PREVIEW_LIMIT) : list.ingredients;
+
+        const ingredients = el('ul', 'grocery-item__ingredients');
+        visible.forEach((ingredient) => {
+            const row = el('li', '', ingredient.name + ' ');
+            row.append(el('span', 'ingredient-qty', '(' + ingredient.quantity + ')'));
+            ingredients.append(row);
+        });
+        panel.append(ingredients);
+
+        if (hasMore) {
+            const more = el('a', 'view-more-link', 'View more...');
+            more.href = 'grocery-list-detail-page.html?id=' + list.id;
+            panel.append(more);
+        }
+
+        const actions = el('div', 'grocery-item__actions');
+        const route = el('a', 'route-button', 'Calculate route');
+        route.href = 'grocery-route-page.html?id=' + list.id;
+        actions.append(route);
+        panel.append(actions);
+
+        li.append(button, panel);
+
+        const item = { li, button, panel };
+        setExpanded(item, false);
+        button.addEventListener('click', () => handleToggle(item));
+        return li;
+    }
+
+    groceryLists.forEach((list) => listEl.append(buildItem(list)));
+    </script>
+</body>
+</html>
