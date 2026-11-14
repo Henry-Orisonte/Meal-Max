@@ -1,0 +1,134 @@
+[hidden] {
+  display: none !important;
+}
+
+.cart-notice:empty {
+  display: none;
+}
+
+.cart-notice {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.recipe-popup[data-state="existing"] .popup-image-frame,
+.recipe-popup[data-state="existing"] .popup-description,
+.recipe-popup[data-state="existing"] .popup-actions,
+.recipe-popup[data-state="new"] .popup-image-frame,
+.recipe-popup[data-state="new"] .popup-description,
+.recipe-popup[data-state="new"] .popup-actions {
+  display: none;
+}
+
+.cart-back,
+.cart-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #111827;
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cart-back:hover,
+.cart-add:hover {
+  background: #111827;
+  border-color: #111827;
+  color: white;
+}
+
+.cart-recipe {
+  margin: 0 0 18px;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.cart-list {
+  max-height: min(50vh, 360px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.cart-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.cart-list li + li {
+  margin-top: 10px;
+}
+
+.cart-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+
+.cart-name small {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.cart-empty {
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.cart-field + .cart-field {
+  margin-top: 18px;
+}
+
+.cart-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cart-field input,
+.cart-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #111827;
+  font: inherit;
+}
+
+.cart-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.cart-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.cart-add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

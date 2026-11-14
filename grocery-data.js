@@ -10,7 +10,7 @@ const TARGET = 'Target';
 const ALDI = 'Aldi';
  
 // Every ingredient lists the 3 stores it can be found at
-const groceryLists = [
+const defaultGroceryLists = [
   {
     id: 1,
     name: 'Weeknight Pasta',
@@ -81,6 +81,99 @@ const groceryLists = [
   },
 ];
  
+// All grocery pages and the saved recipe picker use the same stored lists.
+const GROCERY_LISTS_KEY = 'mealmax-grocery-lists';
+
+function readGroceryLists() {
+  const stored = localStorage.getItem(GROCERY_LISTS_KEY);
+  if (stored === null) return structuredClone(defaultGroceryLists);
+
+  const lists = JSON.parse(stored);
+  if (!Array.isArray(lists) || lists.some(list =>
+    !list || !Number.isInteger(list.id) || typeof list.name !== 'string' ||
+    !Array.isArray(list.ingredients)
+  )) {
+    throw new Error('Grocery lists could not be read.');
+  }
+  return lists;
+}
+
+let groceryLists;
+try {
+  groceryLists = readGroceryLists();
+} catch {
+  groceryLists = structuredClone(defaultGroceryLists);
+}
+
+function groceryIngredient(text) {
+  const parts = text.match(/^([\d¼½¾⅓⅔⅛⅜⅝⅞]+(?:\s+(?:g|kg|ml|l|cups?|tbsp|tsp|cans?|bunch(?:es)?))?)\s+(.+)$/i);
+  return {
+    name: parts ? parts[2] : text,
+    quantity: parts ? parts[1] : 'to taste',
+    // Store choices are sample data, like the lists above.
+    stores: [SAFEWAY, WHOLE_FOODS, WALMART],
+  };
+}
+
+function recipeGroceryIngredients(recipe) {
+  if (!Array.isArray(recipe.ingredients) || !recipe.ingredients.length ||
+      recipe.ingredients.some(ingredient => typeof ingredient !== 'string' || !ingredient.trim())) {
+    throw new Error('This recipe has no ingredients to add.');
+  }
+  return recipe.ingredients.map(groceryIngredient);
+}
+
+function saveGroceryLists(lists) {
+  // Only update the page's data after the browser has saved successfully.
+  localStorage.setItem(GROCERY_LISTS_KEY, JSON.stringify(lists));
+  groceryLists = lists;
+}
+
+function createGroceryList(title, description, recipe) {
+  const name = title.trim();
+  if (!name || name.length > 80 || description.length > 1000) {
+    throw new Error('Enter a title and a shorter description.');
+  }
+
+  const lists = readGroceryLists();
+  const list = {
+    id: Math.max(0, ...lists.map(item => item.id)) + 1,
+    name,
+    description: description.trim(),
+    ingredients: recipeGroceryIngredients(recipe),
+    recipes: [{ id: recipe.id, title: recipe.title }],
+  };
+  saveGroceryLists([...lists, list]);
+  return list;
+}
+
+function addRecipeToGroceryList(listId, recipe) {
+  // Read again so adding a recipe preserves changes made in another tab.
+  const lists = readGroceryLists();
+  const list = lists.find(item => item.id === listId);
+  if (!list) throw new Error('This grocery list no longer exists. Choose another list.');
+  const ingredients = recipeGroceryIngredients(recipe);
+
+  const addedRecipes = list.recipes || [];
+  if (addedRecipes.some(item => item.title === recipe.title)) {
+    return { list, alreadyAdded: true };
+  }
+
+  const ingredientKey = item => (item.name + '|' + item.quantity).toLowerCase().trim();
+  const existing = new Set(list.ingredients.map(ingredientKey));
+  ingredients.forEach(ingredient => {
+    const key = ingredientKey(ingredient);
+    if (!existing.has(key)) {
+      list.ingredients.push(ingredient);
+      existing.add(key);
+    }
+  });
+  list.recipes = [...addedRecipes, { id: recipe.id, title: recipe.title }];
+
+  saveGroceryLists(lists);
+  return { list, alreadyAdded: false };
+}
+
 // Chosen store per ingredient
 // Remembers stores for persistent selection (important for routing)
 // { [listId]: { [ingredientName]: storeIndex } }

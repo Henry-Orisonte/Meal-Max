@@ -25,6 +25,13 @@
         border-bottom: 2px solid #111111;
         font-size: 24px;
     }
+    .list-description {
+        margin: 0 0 20px;
+        color: #4b5563;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
     .ingredient-scroll {
         max-height: min(60vh, 520px);
         margin: 0;
@@ -267,7 +274,9 @@
         route.href = 'grocery-route-page.html?id=' + list.id;
         actions.append(route);
 
-        content.append(backLink(), el('h2', 'list-name', list.name), ingredients, actions);
+        content.append(backLink(), el('h2', 'list-name', list.name));
+        if (list.description) content.append(el('p', 'list-description', list.description));
+        content.append(ingredients, actions);
     }
     </script>
 </body>
