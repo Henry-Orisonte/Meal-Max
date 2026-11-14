@@ -29,3 +29,7 @@ Photo sources: [salmon](https://images.unsplash.com/photo-1467003909585-2f8a7270
 [tacos](https://images.unsplash.com/photo-1551504734-5ee1c4a1479b), and
 [chickpea bowl](https://images.unsplash.com/photo-1512621776951-a57141f2eefd).
 Photos illustrate the sample dishes.
+
+Contribution:
+
+Scott: grocery list and saved recipe page, as well as grocery list image popups
