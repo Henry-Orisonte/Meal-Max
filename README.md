@@ -33,3 +33,4 @@ Photos illustrate the sample dishes.
 Contribution:
 
 Scott: grocery list and saved recipe page, as well as grocery list image popups
+Will: grocery list page, detail page, and route calculation
