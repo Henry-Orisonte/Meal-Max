@@ -32,6 +32,6 @@ Photos illustrate the sample dishes.
 
 Contribution:
 
-Scott: grocery list and saved recipe page, as well as grocery list image popups
-Will: grocery list page, detail page, and route calculation
-Priscilla: index, home page, and navigation bar
+Scott: grocery list and saved recipe page, as well as grocery list image popups<br>
+Will: grocery list page, detail page, and route calculation<br>
+Priscilla: index, home page, and navigation bar<br>
