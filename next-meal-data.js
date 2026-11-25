@@ -1,4 +1,5 @@
 // Sample recipes for the Next Meal results page.
+// Nutrition values are illustrative estimates per serving for this prototype.
 const nextMealRecipes = [
   {
     id: 1,
@@ -8,6 +9,7 @@ const nextMealRecipes = [
     photo: "assets/recipes/salmon.jpg",
     time: 35,
     servings: 2,
+    nutrition: { protein: 40, fat: 34, calories: 620 },
     cuisine: "american",
     diets: [],
     ingredients: [
@@ -35,6 +37,7 @@ const nextMealRecipes = [
     photo: "assets/recipes/alfredo.jpg",
     time: 30,
     servings: 2,
+    nutrition: { protein: 52, fat: 55, calories: 1050 },
     cuisine: "italian",
     diets: [],
     ingredients: [
@@ -63,6 +66,7 @@ const nextMealRecipes = [
     photo: "assets/recipes/stir-fry.jpg",
     time: 20,
     servings: 2,
+    nutrition: { protein: 10, fat: 8, calories: 480 },
     cuisine: "asian",
     diets: [
       "vegetarian",
@@ -96,6 +100,7 @@ const nextMealRecipes = [
     photo: "assets/recipes/tacos.jpg",
     time: 20,
     servings: 2,
+    nutrition: { protein: 21, fat: 28, calories: 670 },
     cuisine: "mexican",
     diets: [
       "vegetarian"
@@ -127,6 +132,7 @@ const nextMealRecipes = [
     photo: "assets/recipes/chickpea-bowl.jpg",
     time: 30,
     servings: 2,
+    nutrition: { protein: 25, fat: 30, calories: 710 },
     cuisine: "mediterranean",
     diets: [
       "vegetarian"

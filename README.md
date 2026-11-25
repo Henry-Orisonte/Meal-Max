@@ -12,6 +12,23 @@ Open http://localhost:3000 to view the site. `npm start` runs the same server.
 Press Ctrl+C in the terminal to stop it. Changes to HTML files appear after
 refreshing the browser.
 
+## Recipe search and nutrition filters
+
+Open http://localhost:3000/next-meal-page.html or choose **Find Your Next
+Meal**. Search recipe names, ingredients, cuisines, or diets. Results update
+as you type and must match every search term and nutrition limit.
+
+Filter protein (g), fat (g), and calories (kcal) with optional minimum and
+maximum values. Limits include their endpoints;
+blank limits are unrestricted. **Clear nutrition filters** keeps your search,
+while **Show all recipes** resets both after an empty result. Search and
+filters are stored in the URL so reloading or sharing preserves them.
+
+Nutrition on cards and recipe details uses illustrative **per-serving sample
+estimates**, not verified nutritional analysis. Search uses the five local
+sample recipes; no external recipe API is required. Run `npm test` to check
+the search and filter behavior.
+
 ## Saved recipes prototype
 
 Open http://localhost:3000/saved-recipes-page.html, or choose **My Saved

@@ -10,6 +10,36 @@ const popup = document.getElementById("recipe-popup");
 const saveButton = document.getElementById("save-recipe");
 const popupStatus = document.getElementById("popup-status");
 let selectedRecipe = null;
+const nutritionInputs = [...form.querySelectorAll('input[type="number"]')];
+
+function readLimits() {
+  const limits = {};
+  const errors = [];
+  nutritionInputs.forEach(input => input.removeAttribute("aria-invalid"));
+  nutritionFields.forEach(field => {
+    const inputs = [document.getElementById(field + "-min"), document.getElementById(field + "-max")];
+    const values = inputs.map(input => input.value === "" ? null : Number(input.value));
+    limits[field] = { min: values[0], max: values[1] };
+    const invalid = inputs.filter(input => !input.validity.valid);
+    const label = field[0].toUpperCase() + field.slice(1);
+    if (invalid.length) {
+      invalid.forEach(input => input.setAttribute("aria-invalid", "true"));
+      errors.push(label + ": enter a number of zero or more.");
+    } else if (values[0] !== null && values[1] !== null && values[0] > values[1]) {
+      inputs.forEach(input => input.setAttribute("aria-invalid", "true"));
+      errors.push(label + ": minimum must not exceed maximum.");
+    }
+  });
+  const error = document.getElementById("filter-error");
+  error.textContent = errors.join(" ");
+  error.hidden = errors.length === 0;
+  return errors.length ? null : limits;
+}
+
+function nutritionText(recipe) {
+  const { protein, fat, calories } = recipe.nutrition;
+  return `${protein} g protein · ${fat} g fat · ${calories} kcal per serving (est.)`;
+}
 
 function createElement(tag, className, text) {
   const node = document.createElement(tag);
@@ -33,6 +63,11 @@ function isSaved(recipe, saved) {
 function readSearch() {
   const params = new URLSearchParams(location.search);
   query.value = params.get("q") || params.get("ingredients") || "";
+  nutritionInputs.forEach(input => {
+    const value = params.get(input.name);
+    // Ignore malformed or negative URL limits rather than silently using them.
+    input.value = value !== null && value.trim() !== "" && Number.isFinite(Number(value)) && Number(value) >= 0 ? String(Number(value)) : "";
+  });
 }
 
 function updateSearch() {
@@ -41,6 +76,10 @@ function updateSearch() {
   const text = query.value.trim();
   if (text) url.searchParams.set("q", text);
   else url.searchParams.delete("q");
+  nutritionInputs.forEach(input => {
+    if (input.value !== "") url.searchParams.set(input.name, input.value);
+    else url.searchParams.delete(input.name);
+  });
 
   try {
     history.replaceState(null, "", url);
@@ -59,6 +98,7 @@ function createRecipeCard(recipe, saved) {
   image.src = recipe.photo;
   row.querySelector(".recipe-title").textContent = recipe.title;
   row.querySelector(".recipe-meta").textContent = recipe.time + " min · " + recipe.servings + " servings";
+  row.querySelector(".recipe-nutrition").textContent = nutritionText(recipe);
   row.querySelector(".recipe-desc").textContent = recipe.summary;
 
   const cuisineName = recipe.cuisine[0].toUpperCase() + recipe.cuisine.slice(1);
@@ -76,12 +116,17 @@ function createRecipeCard(recipe, saved) {
 }
 
 function renderRecipes() {
-  const terms = query.value.trim().toLowerCase().split(/[\s,]+/).filter(Boolean);
-  const matches = nextMealRecipes.filter(recipe => {
-    const searchable = [recipe.title, ...recipe.ingredients, recipe.cuisine, ...recipe.diets]
-      .join(" ").toLowerCase();
-    return terms.every(term => searchable.includes(term));
-  });
+  const limits = readLimits();
+  document.getElementById("clear-search").hidden = !query.value;
+  document.getElementById("clear-filters").hidden = !nutritionInputs.some(input => input.value !== "" || input.validity.badInput);
+  if (!limits) {
+    list.replaceChildren();
+    list.hidden = true;
+    document.getElementById("empty-state").hidden = true;
+    document.getElementById("result-count").textContent = "Check nutrition limits";
+    return;
+  }
+  const matches = filterRecipes(nextMealRecipes, query.value, limits);
   let saved = [];
   try {
     saved = readSavedRecipes();
@@ -92,7 +137,6 @@ function renderRecipes() {
   list.hidden = matches.length === 0;
   document.getElementById("empty-state").hidden = matches.length > 0;
   document.getElementById("result-count").textContent = matches.length + (matches.length === 1 ? " recipe found" : " recipes found");
-  document.getElementById("clear-search").hidden = !query.value.trim();
 }
 
 function updateSaveButton() {
@@ -113,6 +157,7 @@ function openRecipe(recipe) {
   image.src = recipe.photo;
   image.alt = recipe.title;
   document.getElementById("popup-meta").textContent = recipe.time + " min total · " + recipe.servings + " servings";
+  document.getElementById("popup-nutrition").textContent = nutritionText(recipe);
   document.getElementById("popup-description").textContent = recipe.description;
   document.getElementById("popup-ingredients").replaceChildren(...recipe.ingredients.map(text => createElement("li", "", text)));
   document.getElementById("popup-directions").replaceChildren(...recipe.directions.map(text => createElement("li", "", text)));
@@ -181,8 +226,18 @@ form.addEventListener("submit", event => {
   updateSearch();
 });
 document.getElementById("clear-search").addEventListener("click", clearSearch);
+query.addEventListener("input", updateSearch);
+nutritionInputs.forEach(input => input.addEventListener("input", updateSearch));
+document.getElementById("clear-filters").addEventListener("click", () => {
+  nutritionInputs.forEach(input => { input.value = ""; });
+  updateSearch();
+  nutritionInputs[0].focus();
+});
 query.addEventListener("search", updateSearch);
-document.getElementById("show-all").addEventListener("click", clearSearch);
+document.getElementById("show-all").addEventListener("click", () => {
+  nutritionInputs.forEach(input => { input.value = ""; });
+  clearSearch();
+});
 window.addEventListener("popstate", () => {
   readSearch();
   renderRecipes();
