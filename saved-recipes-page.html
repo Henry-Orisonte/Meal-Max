@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Saved Recipes - Meal Max</title>
+  <link rel="stylesheet" href="navigation.css" />
   <link rel="stylesheet" href="saved-recipe-carts.css" />
   <style>
     body {
@@ -223,8 +224,6 @@
     :focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
     @media (max-width: 540px) {
       body { margin: 20px auto; padding: 0 12px; }
-      .user-nav { gap: 12px; flex-wrap: wrap; }
-      .user-nav a { font-size: 14px; }
       .page-container { padding: 16px; }
       .section-header h2 { font-size: 18px; }
       .recipe-photo { width: 100px; }
@@ -241,7 +240,7 @@
     <h1>Meal Max</h1>
   </div>
 
-  <nav class="user-nav">
+  <nav class="user-nav" aria-label="Main navigation">
     <a href="home-page.html">Home</a>
     <a href="next-meal-page.html">Next Meal</a>
     <a href="saved-recipes-page.html" aria-current="page">Saved Recipes</a>

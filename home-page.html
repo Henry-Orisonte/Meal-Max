@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Page - Meal Max</title>
+  <link rel="stylesheet" href="navigation.css" />
     <style>
         * {
             box-sizing: border-box;
@@ -16,68 +17,6 @@
             padding: 0 20px;
             background: #f9fafb;
             color: #111827;
-        }
-        .brand-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .logo-box {
-            width: 30px;
-            height: 30px;
-            background: #111827;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .brand-header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-            color: #111827;
-            letter-spacing: -0.02em;
-        }
-
-        .user-nav {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px;
-            margin-bottom: 28px;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-        }
-
-        .user-nav a {
-            color: #4b5563;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            transition: all 0.15s ease-in-out;
-        }
-
-        .user-nav a:hover {
-            color: #111827;
-            background: #f3f4f6;
-        }
-
-        .user-nav a[aria-current="page"] {
-            color: #111827;
-            background: #f3f4f6;
-            font-weight: 600;
-            box-shadow: inset 0 0 0 1px #e5e7eb;
         }
 
         .page-container {
@@ -132,17 +71,6 @@
                 margin: 20px auto; 
                 padding: 0 12px; 
             }
-            .user-nav { 
-                flex-wrap: wrap; 
-                gap: 4px;
-                padding: 4px;
-            }
-            .user-nav a { 
-                flex: 1;
-                text-align: center;
-                font-size: 13px; 
-                padding: 8px 10px;
-            }
             .page-container { 
                 padding: 24px; 
             }
@@ -152,11 +80,11 @@
 <body>
 
     <div class="brand-header">
-        <div class="logo-box">M</div>
+        <div class="logo-box" aria-hidden="true">M</div>
         <h1>Meal Max</h1>
     </div>
 
-    <nav class="user-nav" aria-label="Main Navigation">
+    <nav class="user-nav" aria-label="Main navigation">
         <a href="home-page.html" aria-current="page">Home</a>
         <a href="next-meal-page.html">Next Meal</a>
         <a href="saved-recipes-page.html">Saved Recipes</a>
