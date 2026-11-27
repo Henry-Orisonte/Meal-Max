@@ -129,6 +129,19 @@ function saveGroceryLists(lists) {
   groceryLists = lists;
 }
 
+function removeGroceryIngredient(listId, ingredientIndex) {
+  const lists = readGroceryLists();
+  const list = lists.find(item => item.id === listId);
+  if (!list) throw new Error('This grocery list no longer exists.');
+  if (!Number.isInteger(ingredientIndex) || ingredientIndex < 0 ||
+      ingredientIndex >= list.ingredients.length) {
+    throw new Error('This grocery list item no longer exists.');
+  }
+
+  list.ingredients.splice(ingredientIndex, 1);
+  saveGroceryLists(lists);
+}
+
 function createGroceryList(title, description, recipe) {
   const name = title.trim();
   if (!name || name.length > 80 || description.length > 1000) {

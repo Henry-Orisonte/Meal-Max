@@ -307,16 +307,20 @@
         return node;
     }
 
-    // Removes an ingredient from page, and doesn't save
-    function removeRow(row) {
+    // Removes an ingredient from page
+    function removeRow(listId, row) {
         const container = row.parentElement;
+        const rows = Array.from(container.querySelectorAll('.ingredient-row'));
+        const ingredientIndex = rows.indexOf(row);
+        removeGroceryIngredient(listId, ingredientIndex);
+
         const neighbor = row.nextElementSibling || row.previousElementSibling;
         row.remove();
 
         if (neighbor) {
             neighbor.querySelector('.remove-button').focus();
         } else {
-            const empty = el('li', 'empty-message', 'All ingredients removed. Reload the page to bring them back.');
+            const empty = el('li', 'empty-message', 'All ingredients removed.');
             empty.tabIndex = -1;
             container.append(empty);
             empty.focus();
@@ -338,7 +342,7 @@
             '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">' +
             '<path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
             '</svg>';
-        remove.addEventListener('click', () => removeRow(row));
+        remove.addEventListener('click', () => removeRow(list.id, row));
 
         const head = el('div', 'ingredient-head');
         head.append(label, remove);
