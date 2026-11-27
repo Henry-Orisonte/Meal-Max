@@ -16,6 +16,45 @@
       color: #111827;
     }
 
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .logo-box {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #111827;
+      border-radius: 4px;
+    }
+
+    .brand-header h1 {
+      font-size: 30px;
+      margin: 0;
+    }
+
+    .user-nav {
+      display: flex;
+      gap: 18px;
+      padding: 12px 0;
+      margin-bottom: 24px;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .user-nav a {
+      color: #4f46e5;
+      font-size: 16px;
+    }
+
+    .user-nav a[aria-current="page"] {
+      color: #111827;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
     .page-container {
       background: white;
       border: 1px solid #e5e7eb;
@@ -197,7 +236,7 @@
 <body>
 
   <div class="brand-header">
-    <div class="logo-box" aria-hidden="true">M</div>
+    <div class="logo-box"></div>
     <h1>Meal Max</h1>
   </div>
 
