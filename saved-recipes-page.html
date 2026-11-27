@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Saved Recipes - Meal Max</title>
+  <link rel="stylesheet" href="navigation.css" />
   <link rel="stylesheet" href="saved-recipe-carts.css" />
   <style>
     body {
@@ -13,45 +14,6 @@
       padding: 0 20px;
       background: #f9fafb;
       color: #111827;
-    }
-
-    .brand-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .logo-box {
-      width: 26px;
-      height: 26px;
-      border: 2px solid #111827;
-      border-radius: 4px;
-    }
-
-    .brand-header h1 {
-      font-size: 30px;
-      margin: 0;
-    }
-
-    .user-nav {
-      display: flex;
-      gap: 18px;
-      padding: 12px 0;
-      margin-bottom: 24px;
-      border-top: 1px solid #e5e7eb;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .user-nav a {
-      color: #4f46e5;
-      font-size: 16px;
-    }
-
-    .user-nav a[aria-current="page"] {
-      color: #111827;
-      font-weight: 600;
-      text-decoration: none;
     }
 
     .page-container {
@@ -223,8 +185,6 @@
     :focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
     @media (max-width: 540px) {
       body { margin: 20px auto; padding: 0 12px; }
-      .user-nav { gap: 12px; flex-wrap: wrap; }
-      .user-nav a { font-size: 14px; }
       .page-container { padding: 16px; }
       .section-header h2 { font-size: 18px; }
       .recipe-photo { width: 100px; }
@@ -237,11 +197,11 @@
 <body>
 
   <div class="brand-header">
-    <div class="logo-box"></div>
+    <div class="logo-box" aria-hidden="true">M</div>
     <h1>Meal Max</h1>
   </div>
 
-  <nav class="user-nav">
+  <nav class="user-nav" aria-label="Main navigation">
     <a href="home-page.html">Home</a>
     <a href="next-meal-page.html">Next Meal</a>
     <a href="saved-recipes-page.html" aria-current="page">Saved Recipes</a>
