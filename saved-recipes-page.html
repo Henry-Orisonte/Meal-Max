@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Saved Recipes - Meal Max</title>
-  <link rel="stylesheet" href="navigation.css" />
   <link rel="stylesheet" href="saved-recipe-carts.css" />
   <style>
     body {
@@ -175,29 +174,69 @@
 
     .recipe-action {
       display: flex;
-      align-items: center;
-      padding: 0 18px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px 12px 0;
+      flex-shrink: 0;
     }
 
     .open-recipe-btn {
-      background: none;
-      border: 1px solid #d1d5db;
+      background: #111827;
+      border: 1px solid #111827;
       border-radius: 6px;
-      width: 36px;
-      height: 36px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
       cursor: pointer;
-      color: #111827;
+      color: #ffffff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
 
     .open-recipe-btn:hover {
-      background: #111827;
-      color: white;
-      border-color: #111827;
+      background: #374151;
+      border-color: #374151;
+    }
+
+    .unsave-btn {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      color: #374151;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .unsave-btn:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    .undo-btn {
+      margin-left: 10px;
+      padding: 4px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #111827;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .undo-btn:hover {
+      background: #f3f4f6;
     }
 
     .empty-state {
@@ -206,6 +245,7 @@
       padding: 40px 0;
       font-size: 16px;
     }
+
     .recipe-popup { box-sizing: border-box; width: min(560px, calc(100% - 32px)); max-height: 90vh; padding: 0; border: 1px solid #d1d5db; border-radius: 12px; color: #111827; }
     .recipe-popup::backdrop { background: rgb(17 24 39 / 55%); }
     .popup-content { padding: 24px; }
@@ -220,16 +260,21 @@
     .popup-actions button + button { border-left: 1px solid #6b7280; }
     .popup-actions button:hover { background: #374151; }
     .popup-actions button[aria-pressed="true"] { background: #4f46e5; }
+    .popup-actions button.popup-unsave-btn { background: #ffffff; color: #b91c1c; font-weight: 600; }
+    .popup-actions button.popup-unsave-btn:hover { background: #fef2f2; }
     .popup-status { padding: 0 24px; font-size: 14px; }
     :focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
     @media (max-width: 540px) {
       body { margin: 20px auto; padding: 0 12px; }
+      .user-nav { gap: 12px; flex-wrap: wrap; }
+      .user-nav a { font-size: 14px; }
       .page-container { padding: 16px; }
       .section-header h2 { font-size: 18px; }
       .recipe-photo { width: 100px; }
       .recipe-body { padding: 12px; min-width: 0; }
       .recipe-body h3 { font-size: 16px; }
-      .recipe-action { padding: 0 8px; }
+      .recipe-action { padding: 10px 10px 10px 0; gap: 6px; }
+      .open-recipe-btn, .unsave-btn { padding: 6px 10px; font-size: 12px; }
     }
   </style>
 </head>
@@ -240,7 +285,7 @@
     <h1>Meal Max</h1>
   </div>
 
-  <nav class="user-nav" aria-label="Main navigation">
+  <nav class="user-nav">
     <a href="home-page.html">Home</a>
     <a href="next-meal-page.html">Next Meal</a>
     <a href="saved-recipes-page.html" aria-current="page">Saved Recipes</a>
@@ -328,7 +373,64 @@
     try { savedRecipes = JSON.parse(localStorage.getItem("savedRecipes")); } catch {}
     if (!Array.isArray(savedRecipes)) savedRecipes = defaultRecipes;
     // Fill missing images on older saved copies of the sample recipes, too.
-    savedRecipes = savedRecipes.map(recipe => ({ ...recipe, photo: recipe.photo || defaultRecipes.find(sample => sample.title === recipe.title)?.photo || "assets/recipes/chickpea-bowl.jpg" }));
+    savedRecipes = savedRecipes.map(recipe => ({
+      ...recipe,
+      photo: recipe.photo || defaultRecipes.find(sample => sample.title === recipe.title)?.photo || "assets/recipes/chickpea-bowl.jpg"
+    }));
+
+    function persistSavedRecipes() {
+      try {
+        localStorage.setItem("savedRecipes", JSON.stringify(savedRecipes));
+      } catch {}
+    }
+
+    let lastRemoved = null;
+
+    function showUnsaveNotice(recipe) {
+      const notice = document.getElementById("cart-notice");
+      notice.textContent = `Removed “${recipe.title}” from saved recipes.`;
+
+      const undoBtn = document.createElement("button");
+      undoBtn.type = "button";
+      undoBtn.className = "undo-btn";
+      undoBtn.textContent = "Undo";
+      undoBtn.onclick = () => {
+        if (!lastRemoved) return;
+        const { item, index, wasSelected } = lastRemoved;
+        const insertAt = Math.min(Math.max(index, 0), savedRecipes.length);
+        savedRecipes.splice(insertAt, 0, item);
+        lastRemoved = null;
+        persistSavedRecipes();
+        renderRecipes();
+        if (wasSelected) {
+          try { localStorage.setItem("selectedRecipe", JSON.stringify(item)); } catch {}
+        }
+        notice.textContent = `Restored “${item.title}” to saved recipes.`;
+      };
+
+      notice.append(undoBtn);
+    }
+
+    function unsaveRecipe(recipeId) {
+      const index = savedRecipes.findIndex(item => item.id === recipeId);
+      if (index === -1) return;
+
+      const [removed] = savedRecipes.splice(index, 1);
+      let wasSelected = false;
+      try {
+        const selected = JSON.parse(localStorage.getItem("selectedRecipe") || "null");
+        if (selected && selected.id === removed.id) {
+          localStorage.removeItem("selectedRecipe");
+          wasSelected = true;
+        }
+      } catch {}
+
+      lastRemoved = { item: removed, index, wasSelected };
+      persistSavedRecipes();
+      renderRecipes();
+      showUnsaveNotice(removed);
+    }
+
     const popup = document.getElementById("recipe-popup");
     const actions = document.getElementById("popup-actions");
     const status = document.getElementById("popup-status");
@@ -344,6 +446,7 @@
       status.textContent = "";
       popup.dataset.state = "recipe";
       actions.replaceChildren();
+
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add Ingredients +";
@@ -366,14 +469,28 @@
         });
         actions.querySelector("button").focus();
       };
-      actions.appendChild(add);
+
+      const unsaveModalBtn = document.createElement("button");
+      unsaveModalBtn.type = "button";
+      unsaveModalBtn.className = "popup-unsave-btn";
+      unsaveModalBtn.textContent = "Unsave Recipe";
+      unsaveModalBtn.onclick = () => {
+        popup.close();
+        unsaveRecipe(recipe.id);
+      };
+
+      actions.append(add, unsaveModalBtn);
       popup.showModal();
     }
+
     popup.querySelector(".close-popup").onclick = () => popup.close();
-    popup.addEventListener("click", event => { if (event.target === popup) {
-      const bounds = popup.getBoundingClientRect();
-      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) popup.close();
-    }});
+    popup.addEventListener("click", event => {
+      if (event.target === popup) {
+        const bounds = popup.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) popup.close();
+      }
+    });
+
     const MAX_LENGTH = 85;
 
     function renderRecipes() {
@@ -408,7 +525,8 @@
             </p>
           </div>
           <div class="recipe-action">
-            <button class="open-recipe-btn" title="Open recipe">&gt;</button>
+            <button type="button" class="open-recipe-btn" aria-label="View details for ${recipe.title}">Details</button>
+            <button type="button" class="unsave-btn" aria-label="Unsave ${recipe.title}">Unsave</button>
           </div>
         `;
 
@@ -427,6 +545,10 @@
         card.querySelector(".open-recipe-btn").addEventListener("click", () => {
           localStorage.setItem("selectedRecipe", JSON.stringify(recipe));
           openRecipe(recipe);
+        });
+
+        card.querySelector(".unsave-btn").addEventListener("click", () => {
+          unsaveRecipe(recipe.id);
         });
 
         listContainer.appendChild(card);
