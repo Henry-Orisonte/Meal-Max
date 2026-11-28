@@ -35,26 +35,6 @@ button {
   margin: 0;
 }
 
-.user-nav {
-  display: flex;
-  gap: 18px;
-  padding: 12px 0;
-  margin-bottom: 24px;
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.user-nav a {
-  color: #4f46e5;
-  font-size: 16px;
-}
-
-.user-nav a[aria-current="page"] {
-  color: #111827;
-  font-weight: 600;
-  text-decoration: none;
-}
-
 .page-container {
   background: white;
   border: 1px solid #e5e7eb;
